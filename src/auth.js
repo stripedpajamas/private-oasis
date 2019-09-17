@@ -1,40 +1,50 @@
 const crypto = require('crypto')
 const bcrypt = require('bcrypt')
 const debug = require('debug')('oasis')
-const { ulid } = require('ulid')
 
 const COOKIE_NAME = 'private-oasis'
 const DEFAULT_ATTEMPTS = 3
 const DEFAULT_COOLOFF = 5 * 60 * 1000
+const DEFAULT_LOGIN_ROUTE = '/login'
 
-function withAuth (getPwd = () => { throw new Error('no password getter') }) {
-  if (typeof getPwd() !== 'string') throw new Error('need valid password getter')
+function withAuth (userConfig = {}) {
+  const config = Object.assign({
+    attempts: DEFAULT_ATTEMPTS,
+    cooloff: DEFAULT_COOLOFF,
+    cookieName: COOKIE_NAME,
+    loginRoute: DEFAULT_LOGIN_ROUTE
+  }, userConfig)
+
+  if (typeof config.getPwdHash !== 'function' || typeof config.getPwdHash() !== 'string') {
+    throw new Error('need valid password getter')
+  }
+
   const state = {
-    remainingAttempts: DEFAULT_ATTEMPTS,
+    remainingAttempts: config.attempts,
     authenticated: false,
     session: null,
-    cooloff: null
+    cooloffTimer: null
   }
 
   function createSession () {
     debug('Creating new session')
-    state.session = ulid()
+    state.session = crypto.randomBytes(32).toString('hex')
     state.authenticated = true
     return state.session
   }
 
   function noteFailure () {
     debug('Failure to authenticate')
-    clearTimeout(state.cooloff)
+    clearTimeout(state.cooloffTimer)
     state.authenticated = false
     state.session = null
     state.remainingAttempts--
     if (state.remainingAttempts < 1) {
       debug('All authentication attempts used; cooling off')
-      state.cooloff = setTimeout(() => {
+      state.cooloffTimer = setTimeout(() => {
         debug('Resetting authentication attempts')
-        state.remainingAttempts = DEFAULT_ATTEMPTS
-      }, DEFAULT_COOLOFF)
+        state.remainingAttempts = config.attempts
+      }, config.cooloff)
     }
   }
 
@@ -49,24 +59,24 @@ function withAuth (getPwd = () => { throw new Error('no password getter') }) {
         fail()
         return
       }
-      const authenticated = await bcrypt.compare(password, getPwd())
+      const authenticated = await bcrypt.compare(password, config.getPwdHash())
       if (!authenticated) {
         noteFailure()
         fail()
         return
       }
       const session = createSession()
-      ctx.cookies.set(COOKIE_NAME, session)
+      ctx.cookies.set(config.cookieName, session)
       ctx.status = 200
     },
     session: async (ctx, next) => {
-      const cookie = ctx.cookies.get(COOKIE_NAME)
+      const cookie = ctx.cookies.get(config.cookieName)
       if (!state.authenticated || cookie.length !== state.session.length) {
-        ctx.redirect('/login')
+        ctx.redirect(config.loginRoute)
         return
       }
       if (!crypto.timingSafeEqual(Buffer.from(cookie), Buffer.from(state.session))) {
-        ctx.redirect('/login')
+        ctx.redirect(config.loginRoute)
         return
       }
       return next()

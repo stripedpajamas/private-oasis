@@ -28,7 +28,9 @@ const image = require('./pages/image')
 module.exports = (config) => {
   const assets = new Koa()
   assets.use(koaStatic(path.join(__dirname, 'assets')))
-  const auth = withAuth(() => process.env.OASIS_PWD) // TODO don't use an env var
+  const auth = withAuth({
+    getPwdHash: () => process.env.OASIS_PWD // TODO don't use env var
+  })
   const app = new Koa()
   module.exports = app
 
