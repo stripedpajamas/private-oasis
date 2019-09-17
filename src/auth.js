@@ -1,5 +1,6 @@
 const crypto = require('crypto')
 const bcrypt = require('bcrypt')
+const debug = require('debug')('oasis')
 const { ulid } = require('ulid')
 
 const COOKIE_NAME = 'private-oasis'
@@ -7,6 +8,7 @@ const DEFAULT_ATTEMPTS = 3
 const DEFAULT_COOLOFF = 5 * 60 * 1000
 
 function withAuth (getPwd = () => { throw new Error('no password getter') }) {
+  if (typeof getPwd() !== 'string') throw new Error('need valid password getter')
   const state = {
     remainingAttempts: DEFAULT_ATTEMPTS,
     authenticated: false,
@@ -15,48 +17,55 @@ function withAuth (getPwd = () => { throw new Error('no password getter') }) {
   }
 
   function createSession () {
+    debug('Creating new session')
     state.session = ulid()
     state.authenticated = true
     return state.session
   }
 
   function noteFailure () {
+    debug('Failure to authenticate')
     clearTimeout(state.cooloff)
     state.authenticated = false
     state.session = null
     state.remainingAttempts--
     if (state.remainingAttempts < 1) {
+      debug('All authentication attempts used; cooling off')
       state.cooloff = setTimeout(() => {
+        debug('Resetting authentication attempts')
         state.remainingAttempts = DEFAULT_ATTEMPTS
       }, DEFAULT_COOLOFF)
     }
   }
 
   return {
-    authenticate: () => async (ctx) => {
-      const { password } = ctx.request.body
-      if (state.remainingAttempts < 1) {
+    authenticate: async (ctx) => {
+      function fail () {
         ctx.status = 401
         ctx.body = 'Unauthorized'
+      }
+      const { password } = ctx.request.body
+      if (state.remainingAttempts < 1 || !password) {
+        fail()
         return
       }
-      if (!bcrypt.compare(getPwd(), password)) {
+      const authenticated = await bcrypt.compare(password, getPwd())
+      if (!authenticated) {
         noteFailure()
-        ctx.status = 401
-        ctx.body = 'Unauthorized'
+        fail()
         return
       }
       const session = createSession()
       ctx.cookies.set(COOKIE_NAME, session)
       ctx.status = 200
     },
-    session: (ctx, next) => {
+    session: async (ctx, next) => {
       const cookie = ctx.cookies.get(COOKIE_NAME)
-      if (!state.authenticated || cookie.length !== session.length) {
+      if (!state.authenticated || cookie.length !== state.session.length) {
         ctx.redirect('/login')
         return
       }
-      if (!crypto.timingSafeEqual(Buffer.from(cookie), Buffer.from(session))) {
+      if (!crypto.timingSafeEqual(Buffer.from(cookie), Buffer.from(state.session))) {
         ctx.redirect('/login')
         return
       }

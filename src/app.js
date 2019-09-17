@@ -28,7 +28,7 @@ const image = require('./pages/image')
 module.exports = (config) => {
   const assets = new Koa()
   assets.use(koaStatic(path.join(__dirname, 'assets')))
-  const auth = withAuth(() => process.env.OASIS_PWD)
+  const auth = withAuth(() => process.env.OASIS_PWD) // TODO don't use an env var
   const app = new Koa()
   module.exports = app
 
@@ -43,7 +43,10 @@ module.exports = (config) => {
 
   router
     .post('/authenticate', koaBody(), auth.authenticate)
-    .use(auth.session)
+    .get('/login', async (ctx) => {
+      ctx.body = 'Login page' // TODO make an actual login page
+    })
+    .use(auth.session) // all routes below are protected
     .param('imageSize', (imageSize, ctx, next) => {
       const size = Number(imageSize)
       ctx.assert(typeof size === 'number' && size % 1 === 0 && size > 2 && size < 1e10, 'Invalid image size')
