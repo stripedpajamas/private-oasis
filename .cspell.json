@@ -13,6 +13,8 @@
         "christianbundy",
         "nanohtml",
         "patchbay",
-        "hyperscript"
+        "hyperscript",
+        "ulid",
+        "cooloff"
     ]
 }
