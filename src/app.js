@@ -1,6 +1,8 @@
 'use strict'
 
 const Koa = require('koa')
+const bcrypt = require('bcrypt')
+const { ulid } = require('ulid')
 const path = require('path')
 const router = require('koa-router')()
 const koaStatic = require('koa-static')
@@ -24,6 +26,11 @@ const reply = require('./pages/reply')
 const publishReply = require('./pages/publish-reply')
 const image = require('./pages/image')
 
+const COOKIE_NAME = 'private-oasis'
+
+let authenticated = false
+let session
+
 module.exports = (config) => {
   const assets = new Koa()
   assets.use(koaStatic(path.join(__dirname, 'assets')))
@@ -41,6 +48,30 @@ module.exports = (config) => {
   app.use(mount('/assets', assets))
 
   router
+    .post('/authenticate', koaBody(), async (ctx) => {
+      const { password } = ctx.request.body
+      if (!bcrypt.compare(`${process.env.OASIS_PWD}`, password)) {
+        ctx.status = 401
+        ctx.body = Unauthorized
+        return
+      }
+      session = ulid()
+      authenticated = true
+      ctx.cookies.set(COOKIE_NAME, session)
+      ctx.status = 200
+    })
+    .use((ctx, next) => {
+      const cookie = ctx.cookies.get(COOKIE_NAME)
+      if (!authenticated || cookie.length !== session.length) {
+        ctx.redirect('/login')
+        return
+      }
+      if (!timingSafeEqual(Buffer.from(cookie), Buffer.from(session))) {
+        ctx.redirect('/login')
+        return
+      }
+      return next()
+    })
     .param('imageSize', (imageSize, ctx, next) => {
       const size = Number(imageSize)
       ctx.assert(typeof size === 'number' && size % 1 === 0 && size > 2 && size < 1e10, 'Invalid image size')
