@@ -24,6 +24,7 @@ const mentions = require('./pages/mentions')
 const reply = require('./pages/reply')
 const publishReply = require('./pages/publish-reply')
 const image = require('./pages/image')
+const login = require('./pages/login')
 
 module.exports = (config) => {
   const assets = new Koa()
@@ -44,9 +45,9 @@ module.exports = (config) => {
   app.use(mount('/assets', assets))
 
   router
-    .post('/authenticate', koaBody(), auth.authenticate)
+    .post('/login', koaBody(), auth.authenticate)
     .get('/login', async (ctx) => {
-      ctx.body = 'Login page' // TODO make an actual login page
+      ctx.body = await login()
     })
     .use(auth.session) // all routes below are protected
     .param('imageSize', (imageSize, ctx, next) => {

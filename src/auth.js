@@ -67,7 +67,7 @@ function withAuth (userConfig = {}) {
       }
       const session = createSession()
       ctx.cookies.set(config.cookieName, session)
-      ctx.status = 200
+      ctx.redirect('/')
     },
     session: async (ctx, next) => {
       const cookie = ctx.cookies.get(config.cookieName)
@@ -79,6 +79,7 @@ function withAuth (userConfig = {}) {
         ctx.redirect(config.loginRoute)
         return
       }
+
       return next()
     }
   }
