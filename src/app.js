@@ -5,6 +5,7 @@ const path = require('path')
 const router = require('koa-router')()
 const koaStatic = require('koa-static')
 const mount = require('koa-mount')
+const helmet = require('koa-helmet')
 const open = require('open')
 const koaBody = require('koa-body')
 const debug = require('debug')('oasis')
@@ -28,11 +29,13 @@ const login = require('./pages/login')
 
 module.exports = (config) => {
   const assets = new Koa()
+  assets.use(helmet())
   assets.use(koaStatic(path.join(__dirname, 'assets')))
   const auth = withAuth({
     getPwdHash: () => process.env.OASIS_PWD // TODO don't use env var
   })
   const app = new Koa()
+  app.use(helmet())
   module.exports = app
 
   app.on('error', (e) => {
