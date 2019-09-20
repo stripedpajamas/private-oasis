@@ -26,6 +26,8 @@ const reply = require('./pages/reply')
 const publishReply = require('./pages/publish-reply')
 const image = require('./pages/image')
 const login = require('./pages/login')
+const compose = require('./pages/compose')
+const publish = require('./pages/publish')
 
 module.exports = (config) => {
   const assets = new Koa()
@@ -113,10 +115,18 @@ module.exports = (config) => {
       const { message } = ctx.params
       ctx.body = await reply(message, false)
     })
+    .get('/compose/', async (ctx) => {
+      ctx.body = await compose()
+    })
     .post('/reply/:message', koaBody(), async (ctx) => {
       const { message } = ctx.params
       const text = String(ctx.request.body.text)
       ctx.body = await publishReply({ message, text })
+      ctx.redirect('/')
+    })
+    .post('/publish/', koaBody(), async (ctx) => {
+      const text = String(ctx.request.body.text)
+      ctx.body = await publish({ text })
       ctx.redirect('/')
     })
     .post('/like/:message', koaBody(), async (ctx) => {
