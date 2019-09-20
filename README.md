@@ -1,51 +1,8 @@
-# Oasis
+# private-oasis
+This repo is a fork of https://github.com/fraction/oasis that I manually keep up-to-date. The difference is there is a password to access anything on the site. The reasoning behind doing this is that my wife uses a Chromebook and as such doesn't have a good way of accessing / interacting with the scuttlebutt social network. This way her scuttlebutt identity can live on a remote server (in Linode or Amazon, etc) and Oasis can be exposed to the public. 
 
-**Friendly Scuttlebutt interface designed for simplicity and accessibility.**
-This is an experimental client built with HTML, CSS, and Node.js without any
-front-end JavaScript. The goal is to support basic social messaging schemas with
-some extra tools for debugging, *not* to support all known message types.
-
-See [the roadmap](./docs/roadmap.md) for more on the scope of this project.
-
-## Usage
-
-```console
-$ oasis --help
-Usage: oasis [options]
-
-Options:
-  --help              Show help                                        [boolean]
-  --version           Show version number                              [boolean]
-  --open              Automatically open app in web browser
-                                                       [boolean] [default: true]
-  --host, --web-host  Hostname for web app to listen on
-                                                 [string] [default: "localhost"]
-  --port, --web-port  Set port for web app to listen on [number] [default: 3000]
-  --debug             Use verbose output for debugging[boolean] [default: false]
-```
-
-## Installation
-
-With [npm](https://npmjs.org/):
-
-```shell
-npm -g install @fraction/oasis
-```
-
-With [yarn](https://yarnpkg.com/en/):
-
-```shell
-yarn global add @fraction/oasis
-```
-
-## See Also
-
-- [patchbay](https://github.com/ssbc/patchbay)
-- [patchwork](https://github.com/ssbc/patchwork)
-- [ssb-server](https://github.com/ssbc/ssb-server)
-- [yap](https://github.com/dominictarr/yap)
+The authentication wrapper is expecting a function `getPwdHash()` that returns a bcrypt-hashed password string. For testing I'm sourcing this from the environment, but I might put it in a file on the remote server in the future.
 
 ## License
 
 ISC
-
