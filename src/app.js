@@ -2,6 +2,8 @@
 
 const Koa = require('koa')
 const path = require('path')
+const fs = require('fs')
+const os = require('os')
 const router = require('koa-router')()
 const koaStatic = require('koa-static')
 const mount = require('koa-mount')
@@ -29,12 +31,20 @@ const login = require('./pages/login')
 const compose = require('./pages/compose')
 const publish = require('./pages/publish')
 
+let pwdHash
+try {
+  pwdHash = fs.readFileSync(path.join(os.homedir(), '.ssb/oasis'))
+} catch (e) {
+  console.error('No ~/.ssb/oasis password found. Exiting...')
+  process.exit(1)
+}
+
 module.exports = (config) => {
   const assets = new Koa()
   assets.use(helmet())
   assets.use(koaStatic(path.join(__dirname, 'assets')))
   const auth = withAuth({
-    getPwdHash: () => process.env.OASIS_PWD // TODO don't use env var
+    getPwdHash: () => pwdHash
   })
   const app = new Koa()
   app.use(helmet())

@@ -15,6 +15,7 @@
         "patchbay",
         "hyperscript",
         "ulid",
-        "cooloff"
+        "cooloff",
+        "linode"
     ]
 }
