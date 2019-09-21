@@ -33,7 +33,7 @@ const publish = require('./pages/publish')
 
 let pwdHash
 try {
-  pwdHash = fs.readFileSync(path.join(os.homedir(), '.ssb/oasis'), 'utf8')
+  pwdHash = fs.readFileSync(path.join(os.homedir(), '.ssb/oasis'), 'utf8').trim()
 } catch (e) {
   console.error('No ~/.ssb/oasis password found. Exiting...')
   process.exit(1)
