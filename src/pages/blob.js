@@ -19,35 +19,23 @@ const fakeImage = (imageSize) =>
 
 const fakeId = '&0000000000000000000000000000000000000000000=.sha256'
 
-module.exports = async function imagePage ({ blobId, imageSize }) {
+module.exports = async function imagePage ({ blobId }) {
   const bufferSource = await blob.get({ blobId })
 
   debug('got buffer source')
   return new Promise((resolve) => {
     if (blobId === fakeId) {
-      debug('fake image')
-      fakeImage(imageSize).then(result => resolve(result))
+      fakeImage(1).then(result => resolve(result))
     } else {
-      debug('not fake image')
       pull(
         bufferSource,
         pull.collect(async (err, bufferArray) => {
           if (err) {
-            debug('err')
             await blob.want({ blobId })
-            const result = fakeImage(imageSize)
-            debug({ result })
-            resolve(result)
+            fakeImage(1).then(result => resolve(result))
           } else {
-            debug('no err')
             const buffer = Buffer.concat(bufferArray)
-            sharp(buffer)
-              .resize(imageSize, imageSize)
-              .png()
-              .toBuffer()
-              .then((data) => {
-                resolve(data)
-              })
+            resolve(buffer)
           }
         })
       )

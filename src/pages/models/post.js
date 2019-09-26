@@ -9,6 +9,33 @@ const cooler = require('./lib/cooler')
 const configure = require('./lib/configure')
 const markdown = require('./lib/markdown')
 
+const getMessages = async ({ myFeedId, customOptions, ssb, query }) => {
+  const options = configure({ query, index: 'DTA' }, customOptions)
+
+  const source = await cooler.read(
+    ssb.backlinks.read, options
+  )
+
+  return new Promise((resolve, reject) => {
+    pull(
+      source,
+      pull.filter((msg) =>
+        typeof msg.value.content !== 'string' &&
+        msg.value.content.type === 'post' &&
+        msg.value.author !== myFeedId
+      ),
+      pull.take(60),
+      pull.collect((err, collectedMessages) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(transform(ssb, collectedMessages, myFeedId))
+        }
+      })
+    )
+  })
+}
+
 const transform = (ssb, messages, myFeedId) => Promise.all(messages.map(async (msg) => {
   debug('transforming %s', msg.key)
 
@@ -87,7 +114,18 @@ const transform = (ssb, messages, myFeedId) => Promise.all(messages.map(async (m
   const avatarUrl = `/image/32/${encodeURIComponent(avatarId)}`
 
   const ts = new Date(msg.value.timestamp)
-  lodash.set(msg, 'value.meta.timestamp.received.iso8601', ts.toISOString())
+  let isoTs
+
+  try {
+    isoTs = ts.toISOString()
+  } catch (e) {
+    // Just in case it's an invalid date. :(
+    debug(e)
+    const receivedTs = new Date(msg.timestamp)
+    isoTs = receivedTs.toISOString()
+  }
+
+  lodash.set(msg, 'value.meta.timestamp.received.iso8601', isoTs)
 
   const ago = Date.now() - Number(ts)
   lodash.set(msg, 'value.meta.timestamp.received.since', prettyMs(ago, { compact: true }))
@@ -146,30 +184,7 @@ module.exports = {
       }
     }]
 
-    const options = configure({ query, index: 'DTA' }, customOptions)
-
-    const source = await cooler.read(
-      ssb.backlinks.read, options
-    )
-
-    const messages = await new Promise((resolve, reject) => {
-      pull(
-        source,
-        pull.filter((msg) =>
-          typeof msg.value.content !== 'string' &&
-          msg.value.content.type === 'post' &&
-          msg.value.author !== myFeedId
-        ),
-        pull.take(60),
-        pull.collect((err, collectedMessages) => {
-          if (err) {
-            reject(err)
-          } else {
-            resolve(transform(ssb, collectedMessages, myFeedId))
-          }
-        })
-      )
-    })
+    const messages = await getMessages({ myFeedId, customOptions, ssb, query })
 
     return messages
   },
@@ -185,27 +200,7 @@ module.exports = {
       }
     }]
 
-    const options = configure({ query, index: 'DTA' }, customOptions)
-
-    const source = await cooler.read(
-      ssb.backlinks.read, options
-    )
-
-    const messages = await new Promise((resolve, reject) => {
-      pull(
-        source,
-        pull.filter((msg) => typeof msg.value.content !== 'string' &&
-          msg.value.content.type === 'post'),
-        pull.take(60),
-        pull.collect((err, collectedMessages) => {
-          if (err) {
-            reject(err)
-          } else {
-            resolve(transform(ssb, collectedMessages, myFeedId))
-          }
-        })
-      )
-    })
+    const messages = await getMessages({ myFeedId, customOptions, ssb, query })
 
     return messages
   },

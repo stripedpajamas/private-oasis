@@ -5,10 +5,10 @@ const {
   form,
   textarea
 } = require('hyperaxe')
-
 const template = require('./components/template')
+const post = require('./components/post')
 
-module.exports = () => {
+module.exports = ({ messages }) => {
   const publishForm = '/publish/'
 
   return template(
@@ -16,6 +16,7 @@ module.exports = () => {
       textarea({ autofocus: true, required: true, name: 'text' }),
       button({
         type: 'submit'
-      }, 'publish (public!!!)'))
+      }, 'submit')),
+    messages.map((msg) => post({ msg }))
   )
 }

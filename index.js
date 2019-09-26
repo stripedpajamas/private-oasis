@@ -3,6 +3,8 @@
 'use strict'
 
 const yargs = require('yargs')
+const fs = require('fs').promises
+const path = require('path')
 
 const config = yargs
   .env('OASIS')
@@ -15,14 +17,12 @@ const config = yargs
   .options('host', {
     describe: 'Hostname for web app to listen on',
     default: 'localhost',
-    type: 'string',
-    alias: 'web-host' // deprecated
+    type: 'string'
   })
   .options('port', {
     describe: 'Set port for web app to listen on',
     default: 3000,
-    type: 'number',
-    alias: 'web-port' // deprecated
+    type: 'number'
   })
   .options('debug', {
     describe: 'Use verbose output for debugging',
@@ -41,6 +41,12 @@ process.argv = []
 if (config.debug) {
   process.env.DEBUG = '*'
 }
+
 const app = require('./src/app')
 
-app(config)
+const start = async () => {
+  config.readme = await fs.readFile(path.join(__dirname, 'README.md'), 'utf8')
+  app(config)
+}
+
+start()

@@ -5,15 +5,16 @@ const flotilla = require('@fraction/flotilla')
 const ssbClient = require('ssb-client')
 const ssbConfig = require('ssb-config')
 
-const server = flotilla()
+const server = flotilla({ ws: { http: false } })
 
 const rawConnect = () => new Promise((resolve, reject) => {
   ssbClient({
     manifest: {
       about: { socialValue: 'async' },
       backlinks: { read: 'source' },
-      blobs: { get: 'source' },
+      blobs: { get: 'source', want: 'async' },
       createUserStream: 'source',
+      createHistoryStream: 'source',
       get: 'sync',
       messagesByType: 'source',
       publish: 'async',
