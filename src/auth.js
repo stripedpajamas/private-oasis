@@ -12,7 +12,8 @@ function withAuth (userConfig = {}) {
     attempts: DEFAULT_ATTEMPTS,
     cooloff: DEFAULT_COOLOFF,
     cookieName: COOKIE_NAME,
-    loginRoute: DEFAULT_LOGIN_ROUTE
+    loginRoute: DEFAULT_LOGIN_ROUTE,
+    getPwdHash: null
   }, userConfig)
 
   if (typeof config.getPwdHash !== 'function' || typeof config.getPwdHash() !== 'string') {
