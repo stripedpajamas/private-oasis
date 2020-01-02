@@ -1,23 +1,26 @@
 # Roadmap
 
 - [ ] Get
-  - [ ] Author
+  - [x] Author
     - [x] Name
     - [x] Description
     - [x] Image
-    - [ ] Follow / unfollow (public)
-    - [ ] Listen / ignore  (private)
-    - [ ] Block / unblock (public)
+    - [x] Follow / unfollow (public)
+    - [x] Block / unblock (public)
+    - [x] Likes
+    - [x] Metadata ("about" messages)
+    - [x] Markdown mention
   - [ ] Posts
     - [x] Render Markdown
-    - [x] From author
-    - [x] About hashtag
-    - [x] Threading
+    - [x] Posts from author
+    - [x] Posts about hashtag
+    - [x] Posts that are thread roots
+    - [x] Posts that are thread comments
+    - [x] Nested comments in threads
     - [ ] Pagination to view older posts
-    - [ ] Search to filter posts by content
-    - [ ] Notifications
-      - [x] Author mention
-      - [ ] Message mention
+    - [x] Search to filter posts by content
+    - [x] Notifications (by author mention)
+    - [x] Content warning
 - [ ] Set
   - [ ] Author
     - [ ] Self
@@ -26,12 +29,16 @@
       - [ ] Image
     - [ ] Others
       - [ ] Follow / unfollow (public)
-      - [ ] Listen / ignore  (private)
       - [ ] Block / unblock (public)
   - [ ] Posts
-    - [ ] New
+    - [x] New
     - [x] Reply
-    - [ ] Reply all
-    - [ ] Easy message / author reference
+    - [x] Comment
     - [ ] Pre-publish preview
-  - [x] Like / unlike
+    - [ ] Add blob attachment(s)
+    - [x] Correctly set `branch`
+    - [ ] Content warning
+  - [x] Votes
+    - [x] Like
+    - [x] Unlike
+    - [x] Correctly set `branch`

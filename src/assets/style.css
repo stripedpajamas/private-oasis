@@ -1,26 +1,77 @@
 :root {
-  --blue: hsl(240, 75%, 50%);
-  --common-radius: 2px;
-  --highlight-shadow: hsl(240, 66%, 92%);
-  --highlight: hsl(240, 88%, 88%);
-  --almost-white: hsl(240, 12.5%, 98.4%);
-  --off-white: hsl(240, 12%, 92%);
-  --discreet: hsl(240, 12%, 96%);
-  --primary: hsl(240, 17%, 17%);
-  --red: hsl(330, 75%, 50%);
-  --secondary: hsl(240, 8%, 38%);
-  --thin-stroke: 1px;
-  --medium-stroke: 3px;
-  --heavy-stroke: 6px;
+  /*
+   * according to https://www.color-blindness.com/color-name-hue/
+   *
+   * amber
+   * chartreuse
+   * free-speech-green (lime)
+   * aqua
+   * blue
+   * electric-indigo
+   * hot-magenta
+   */
+  --red: var(--base08);
+  --orange: var(--base09);
+  --yellow: var(--base0A);
+  --green: var(--base0B);
+  --cyan: var(--base0C);
+  --blue: var(--base0D);
+  --violet: var(--base0E);
+  --magenta: var(--base0F);
+
+  /* convenience */
+  --bg: var(--base00);
+  --bg-status: var(--base01);
+  --bg-selection: var(--base02);
+  --fg-alt: var(--base03);
+  --fg-status: var(--base04);
+  --fg: var(--base05);
+  --fg-light: var(--base06);
+  --bg-light: var(--base07);
+
+  /* line */
+
+  --peta: 32rem;
+  --tera: 16rem;
+  --giga: 8rem;
+  --mega: 4rem;
+  --kilo: 2rem;
+  --whole: 1rem;
+  --milli: 0.5rem;
+  --micro: 0.25rem;
+  --nano: 0.125rem;
+  --pico: 0.0625rem;
+
+  /* size */
+  --common-radius: var(--micro);
+  --measure: calc(var(--peta) + var(--mega));
+  --line: 1.5rem;
+}
+
+* {
+  scrollbar-color: var(--fg-status) var(--bg);
+}
+
+::selection {
+  background-color: var(--bg-selection);
+  color: var(--fg-light);
 }
 
 html {
   display: flex;
-  font-family: system-ui, 
-  -apple-system, BlinkMacSystemFont, 
-  "Segoe UI", "Roboto", "Oxygen", 
-  "Ubuntu", "Cantarell", "Fira Sans", 
-  "Droid Sans", "Helvetica Neue", sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Roboto",
+    "Oxygen",
+    "Ubuntu",
+    "Cantarell",
+    "Fira Sans",
+    "Droid Sans",
+    "Helvetica Neue",
+    sans-serif;
   justify-content: center;
   font-size: 12pt;
   line-height: 1.5;
@@ -28,103 +79,264 @@ html {
   padding: 0;
 }
 
-/* https://www.desmos.com/calculator/3elcf5cwhn */
-h1 { font-size: 150%; }
-h2 { font-size: 128%; }
-h3 { font-size: 120%; }
-h4 { font-size: 116%; }
-h5 { font-size: 113%; }
-h6 { font-size: 111%; }
+main {
+  margin: 0;
+  margin-bottom: var(--whole);
+}
 
-h1, h2, h3, h4, h5, h6 {
-  margin: 0.5em 0;
+/* https://www.desmos.com/calculator/3elcf5cwhn */
+h1 { font-size: 133%; } /*     4 / 3 */
+h2 { font-size: 115%; } /*     8 / 7 */
+h3 { font-size: 105%; } /*   16 / 15 */
+h4 { font-size: 103%; } /*   32 / 31 */
+h5 { font-size: 101%; } /*   64 / 63 */
+h6 { font-size: 100%; } /* 128 / 127 */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--bg-light);
+  margin: var(--whole) 0;
+}
+
+ul,
+ol {
+  padding-left: var(--whole);
+}
+
+a {
+  color: var(--fg-light);
+}
+
+button {
+  cursor: pointer;
+  background: var(--fg);
+  color: var(--bg);
+  border: var(--pico) solid var(--fg);
+  padding: var(--milli) var(--whole);
+  border-radius: var(--common-radius);
+}
+
+section > footer > a,
+section > footer > form > button {
+  color: var(--fg-status);
+  font-weight: bold;
+}
+
+section > footer > form > button {
+  display: inline-block;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+select,
+input {
+  background: var(--bg);
+  color: var(--fg);
+  border: var(--pico) solid var(--bg-selection);
+  padding: var(--milli);
+  margin-right: var(--whole);
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: var(--common-radius);
+}
+
+textarea {
+  background-color: var(--bg);
+  box-sizing: border-box;
+  display: block;
+  font-size: var(--whole);
+  padding: var(--whole);
+  resize: vertical;
+  width: 100%;
+  margin: var(--whole) 0;
+  height: 12rem;
+  border: var(--pico) solid var(--bg-selection);
+  border-radius: var(--common-radius);
+  color: var(--fg);
+}
+
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--blue);
+}
+
+button:focus,
+button:hover {
+  background-color: var(--fg-light);
+}
+
+section > footer > form > button:hover,
+section > footer > form > button:focus {
+  background-color: transparent;
 }
 
 pre {
   overflow-x: auto;
-  background-color: var(--almost-white);
-  padding: 1rem;
+  background-color: var(--bg);
+  padding: var(--milli);
   font-size: 92%;
   border-radius: var(--common-radius);
-  border: var(--thin-stroke) solid var(--off-white);
+  border: var(--pico) solid var(--bg-status);
 }
 
-.message.private {
-  background-color: var(--discreet);
-}
-
-.message.reply {
-  margin-top: 0;
-  margin-bottom: -1px;
-}
-
-.message.thread-target {
-  box-shadow: 0 0 0 var(--medium-stroke) var(--highlight-shadow);
-  border-color: var(--highlight);
-}
-
-.message img, .message video {
+section code {
   max-width: 100%;
-  max-height: 30em;
-  border: var(--thin-stroke) dotted var(--off-white);
+  overflow-wrap: break-word;
+  padding: 0.125em 0.25em;
+  margin: 0;
+  font-size: 85%;
+  background-color: var(--bg);
+  border-radius: var(--common-radius);
+  border: var(--pico) solid var(--bg-status);
 }
 
-.message > :first-child {
+section pre code {
+  color: inherit;
+  padding: 0;
+  margin: 0;
+  font-size: 100%;
+  background-color: initial;
+  border: initial;
+  border-radius: initial;
+}
+
+section blockquote {
+  margin-left: 0;
+  border-left: var(--milli) solid var(--bg-status);
+  padding-left: var(--whole);
+}
+
+section img,
+section video {
+  max-width: 100%;
+  max-height: 100vh;
+  border: var(--pico) solid var(--bg-status);
+  border-radius: var(--common-radius);
+  box-sizing: border-box;
+}
+
+.profile > img,
+.profile > h1 {
+  display: inline-block;
+}
+
+section > header.profile {
+  height: auto;
+  justify-content: left;
+}
+
+.profile > img {
+  width: 4rem;
+  height: 4rem;
+  margin-right: var(--whole);
+  border-radius: var(--common-radius);
+}
+
+.private {
+  border-left: var(--milli) solid var(--violet);
+  border-color: var(--violet);
+}
+
+section.thread-target {
+  border: var(--pico) solid var(--blue);
+  box-shadow: 0 0 var(--micro) var(--blue);
+}
+
+section.thread-target.private {
+  border: var(--pico) solid var(--violet);
+  border-left: var(--micro) solid var(--violet);
+  border-color: var(--violet);
+  box-shadow: 0 0 var(--micro) var(--violet);
+}
+
+section audio {
+  width: 100%;
+}
+
+section > :first-child {
   margin-top: 0;
   padding-top: 0;
 }
 
-.message > :last-child {
+.content > :last-child {
   margin-bottom: 0;
-  padding-bottom: 0;
-}
-
-.message code {
-  color: var(--red);
-}
-
-.message pre code {
-  color: inherit;
 }
 
 @media screen {
   html {
     min-height: 100%;
-    color: var(--primary);
+    color: var(--fg);
+    background-color: var(--bg-status);
   }
+
   body {
     width: 100%;
-    max-width: 42rem;
-    margin: 0 1rem;
-    overflow: scroll;
+    max-width: var(--measure);
+    margin: 0;
   }
 }
 
-.message {
-  padding: 1.5rem;
-  margin: 1rem 0;
-  border-radius: var(--common-radius);
-  border: var(--thin-stroke) solid var(--off-white);
-  word-wrap: break-word;
+nav {
+  margin: var(--whole) 0;
 }
 
-.message > header.metadata {
-  height: 1.5rem;
+section header a {
+  display: flex;
+  color: var(--fg-status);
+  text-decoration: none;
+  font-weight: bold;
+  margin-right: var(--micro);
+  margin-left: var(--micro);
+}
+
+nav > ul > li > a {
+  color: var(--fg);
+  text-decoration: none;
+  font-weight: bold;
+}
+
+nav > ul > li > a.current {
+  text-decoration: underline;
+}
+
+section {
+  padding: var(--whole);
+  border-radius: var(--common-radius);
+  margin: var(--whole) 0;
+  word-wrap: break-word;
+  background: var(--bg);
+}
+
+section > header {
+  height: var(--line);
+  display: flex;
+  margin-bottom: var(--whole);
+  justify-content: space-between;
+  color: var(--fg-status);
+}
+
+section header a > .avatar {
+  width: var(--line);
+  height: var(--line);
+  border-radius: var(--common-radius);
+  margin-right: var(--micro);
+}
+
+section header span {
   display: flex;
 }
 
-.message > header > a > .avatar {
-  width: 1.5rem;
-  height: 1.5rem;
-  border-radius: var(--common-radius);
-  margin-right: 0.5rem;
-}
-.message > header > .text > .author {
-  font-weight: bold;
-}
-.message > header > .text > .author > a {
-  color: black;
-  text-decoration: none;
+section header .author > a:first-child {
+  margin-left: 0;
+  color: var(--fg-light);
 }
 
 /*
@@ -144,54 +356,38 @@ pre {
  * We also use `pointer-events: none` to ensure that this invisible div doesn't
  * capture cursor events (clicks, drags, etc) on surrounding elements, because
  * otherwise we could have a problem where someone clicks above the invisible
- * div but the browser things they're clicking the gigantic amount of padding.
+ * div but the browser picogs they're clicking the gigantic amount of padding.
  */
-.message > .centered-footer {
+section > .centered-footer {
   padding-top: 50vh;
   margin-top: -50vh;
   pointer-events: none;
 }
 
-.message > footer {
+section > footer {
   display: flex;
   justify-content: space-between;
+  margin-top: var(--whole);
+  color: var(--fg-status);
 }
 
-.message > footer > * {
+section > footer > * {
   text-decoration: none;
 }
 
-.message > footer > a, .message > footer > form > button {
-  color: var(--secondary);
-  font-weight: bold;
+section > footer > form > button.liked {
+  color: var(--red);
 }
 
-.message > footer > form > button.liked {
-  color: var(--red)
-}
-
-.message > footer > form {
-  display: inline-block;
-}
-
-.message > footer > form > button{
-  display: inline-block;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  padding: 0;
-}
-
-.message blockquote {
-  margin-left: 0;
-  border-left: var(--heavy-stroke) solid var(--off-white);
-  padding-left: 1rem;
+label {
+  display: block;
+  margin: 0;
 }
 
 nav > ul {
   display: flex;
   justify-content: space-between;
-  margin: 1rem 0;
+  margin: 0;
   padding: 0;
 }
 
@@ -199,40 +395,10 @@ nav > ul > li {
   list-style: none;
 }
 
-nav > ul > li > a {
-  color: var(--secondary);
-  text-decoration: none;
-  font-weight: bold;
-}
-
 .profile {
-  margin-top: 1.5rem;
+  margin-top: var(--whole);
   display: flex;
-  margin-bottom: 1.5rem;
-}
-
-.profile > img, .profile > h1 {
-  display: inline-block;
-}
-
-.profile > img {
-  width: 4rem;
-  height: 4rem;
-  margin-right: 2rem;
-  border-radius: var(--common-radius);
-}
-
-.message code {
-  max-width: 100%;
-  overflow-wrap: break-word;
-}
-
-ul, ol {
-  padding-left: 1.5rem;
-}
-
-a {
-  color: var(--blue)
+  margin-bottom: var(--whole);
 }
 
 progress {
@@ -240,25 +406,19 @@ progress {
   width: 100%;
 }
 
-textarea {
-  box-sizing: border-box;
-  display: block;
-  font-size: 1rem;
-  padding: 1rem;
-  resize: vertical;
-  width: 100%;
-  height: 9rem;
-  margin: 1rem 0;
+progress::-moz-progress-bar,
+progress::-webkit-progress-value,
+progress {
+  background: var(--blue);
+  border-color: var(--blue);
 }
 
 /* content warning! */
 summary {
-  padding: 1rem 0.5rem;
-  background-color: hsl(45, 100%, 83%);
-  margin: 1rem 0;
+  padding: var(--milli);
+  margin: 0;
   cursor: pointer;
-  color: hsl(45, 100%, 20%);
-  border: var(--thin-stroke) solid hsl(45, 100%, 66%);
+  border: var(--pico) solid var(--bg-selection);
 }
 
 .md-mention {
@@ -267,7 +427,30 @@ summary {
   -webkit-user-select: all;
   user-select: all;
   background: none;
-  margin: 0;
-  padding: 0;
-  border: 0;
+  font-size: 50%;
+}
+
+table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+td,
+th {
+  padding: var(--milli);
+  outline: var(--pico) solid var(--bg-status);
+}
+
+th {
+  text-align: left;
+  background-color: var(--bg-status);
+}
+
+input[type="search"] {
+  width: 100%;
+  margin: var(--whole) 0;
+}
+
+hr {
+  border: var(--pico) solid var(--fg-alt);
 }

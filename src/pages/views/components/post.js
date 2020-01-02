@@ -2,7 +2,6 @@
 
 const {
   a,
-  abbr,
   article,
   button,
   details,
@@ -30,18 +29,31 @@ module.exports = ({ msg }) => {
   const url = {
     author: `/author/${encoded.author}`,
     likeForm: `/like/${encoded.key}`,
-    context: `/thread/${encoded.key}#${encoded.key}`,
+    link: `/thread/${encoded.key}#${encoded.key}`,
     parent: `/thread/${encoded.parent}#${encoded.parent}`,
     avatar: msg.value.meta.author.avatar.url,
-    raw: `/raw/${encoded.key}`,
-    reply: `/reply/${encoded.key}`
+    json: `/json/${encoded.key}`,
+    reply: `/reply/${encoded.key}`,
+    comment: `/comment/${encoded.key}`
   }
 
   const isPrivate = Boolean(msg.value.meta.private)
-  const isThreadTarget = Boolean(lodash.get(msg, 'value.meta.thread.target', false))
+  const isRoot = msg.value.content.root == null
+  const isThreadTarget = Boolean(lodash.get(
+    msg,
+    'value.meta.thread.target',
+    false
+  ))
+
+  // TODO: I think this is actually true for both replies and comments.
+  const isReply = Boolean(lodash.get(
+    msg,
+    'value.meta.thread.reply',
+    false
+  ))
 
   const { name } = msg.value.meta.author
-  const timeAgo = msg.value.meta.timestamp.received.since
+  const timeAgo = msg.value.meta.timestamp.received.since.replace('~', '')
 
   const depth = lodash.get(msg, 'value.meta.thread.depth', 0)
 
@@ -55,11 +67,7 @@ module.exports = ({ msg }) => {
 
   const likeCount = msg.value.meta.votes.length
 
-  const parentLink = msg.value.content.root != null
-    ? a({ href: url.parent }, 'parent')
-    : null
-
-  const messageClasses = ['message']
+  const messageClasses = []
 
   if (isPrivate) {
     messageClasses.push('private')
@@ -69,14 +77,33 @@ module.exports = ({ msg }) => {
     messageClasses.push('thread-target')
   }
 
-  if (depth > 0) {
+  if (isReply) {
+    // True for comments too, I think
     messageClasses.push('reply')
+  }
+
+  const isFork = msg.value.meta.postType === 'reply'
+
+  const postOptions = {
+    post: null,
+    comment: [
+      'commented on ',
+      a({ href: url.parent }, ' thread')
+    ],
+    reply: [
+      'replied to ',
+      a({ href: url.parent }, ' message')
+    ],
+    mystery: 'posted a mysterious message'
   }
 
   const emptyContent = '<p>undefined</p>\n'
   const articleElement = markdownContent === emptyContent
     ? article({ class: 'content' }, pre({
-      innerHTML: highlightJs.highlight('json', JSON.stringify(msg, null, 2)).value
+      innerHTML: highlightJs.highlight(
+        'json',
+        JSON.stringify(msg, null, 2)
+      ).value
     }))
     : article({ class: 'content', innerHTML: markdownContent })
 
@@ -91,16 +118,21 @@ module.exports = ({ msg }) => {
     section({
       id: msg.key,
       class: messageClasses.join(' '),
-      style: `margin-left: ${depth * 1.5}rem`
+      style: `margin-left: ${depth}rem;`
     },
-    header({ class: 'metadata' },
-      a({ href: url.author },
-        img({ class: 'avatar', src: url.avatar, alt: '' })),
-      span({ class: 'text' },
-        span({ class: 'author' },
-          a({ href: url.author }, name)),
-        span({ class: 'timestamp' }, ` ${timeAgo} ago`),
-        isPrivate ? abbr({ title: 'private' }, '🔒') : null)),
+    header(
+      span({ class: 'author' },
+        a({ href: url.author },
+          img({ class: 'avatar', src: url.avatar, alt: '' }),
+          name
+        ),
+        postOptions[msg.value.meta.postType]
+      ),
+      span({ class: 'time' },
+        isPrivate ? '🔒' : null,
+        a({ href: url.link }, timeAgo)
+      )
+    ),
     articleContent,
 
     // HACK: centered-footer
@@ -123,10 +155,9 @@ module.exports = ({ msg }) => {
           class: likeButton.class
         },
         `❤ ${likeCount}`)),
-      isPrivate ? null : a({ href: url.reply }, 'reply'),
-      a({ href: url.context }, 'context'),
-      parentLink,
-      a({ href: url.raw }, 'raw')
+      isPrivate ? null : a({ href: url.comment }, 'comment'),
+      (isPrivate || isRoot || isFork) ? null : a({ href: url.reply }, 'reply'),
+      a({ href: url.json }, 'json')
     ))
 
   return fragment

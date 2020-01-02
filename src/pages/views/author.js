@@ -2,21 +2,31 @@
 
 const highlightJs = require('highlight.js')
 const {
+  a,
   article,
+  footer,
+  h1,
   header,
   img,
-  h1,
+  pre,
   section,
-  pre
+  span
 } = require('hyperaxe')
 const post = require('./components/post')
 
 const template = require('./components/template')
 
 module.exports = ({
-  avatarUrl, name, description, messages, feedId
+  aboutPairs,
+  avatarUrl,
+  description,
+  feedId,
+  messages,
+  name,
+  relationship
 }) => {
-  const markdownMention = highlightJs.highlight('markdown', `[@${name}](${feedId})`).value
+  const mention = `[@${name}](${feedId})`
+  const markdownMention = highlightJs.highlight('markdown', mention).value
 
   const prefix = section({ class: 'message' },
     header({ class: 'profile' },
@@ -28,7 +38,12 @@ module.exports = ({
     }),
     description !== '<p>null</p>\n'
       ? article({ innerHTML: description })
-      : null)
+      : null,
+    footer(
+      a({ href: `/likes/${encodeURIComponent(feedId)}` }, 'view likes'),
+      span(relationship)
+    )
+  )
 
   return template(
     prefix,

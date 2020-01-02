@@ -1,25 +1,39 @@
 'use strict'
 
 const debug = require('debug')('oasis')
-const flotilla = require('@fraction/flotilla')
 const ssbClient = require('ssb-client')
-const ssbConfig = require('ssb-config')
-
-const server = flotilla({ ws: { http: false } })
 
 const rawConnect = () => new Promise((resolve, reject) => {
   ssbClient({
     manifest: {
-      about: { socialValue: 'async' },
+      about: {
+        socialValue: 'async',
+        read: 'source'
+      },
       backlinks: { read: 'source' },
-      blobs: { get: 'source', want: 'async' },
+      blobs: {
+        get: 'source',
+        ls: 'source',
+        want: 'async'
+      },
+      conn: {
+        peers: 'source'
+      },
       createUserStream: 'source',
       createHistoryStream: 'source',
       get: 'sync',
       messagesByType: 'source',
       publish: 'async',
       status: 'async',
-      whoami: 'sync'
+      tangle: { branch: 'async' },
+      query: { read: 'source' },
+      friends: {
+        isFollowing: 'async',
+        isBlocking: 'async'
+      },
+      search: {
+        query: 'source'
+      }
     }
   }, (err, api) => {
     if (err) {
@@ -49,7 +63,7 @@ const db = {
     })
   },
   read (method, ...args) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       resolve(method(...args))
     })
   }
@@ -57,16 +71,14 @@ const db = {
 
 debug.enabled = true
 
-const handle = new Promise((resolve, reject) => {
+const handle = new Promise((resolve) => {
   rawConnect().then((ssb) => {
     debug('Using pre-existing Scuttlebutt server instead of starting one')
     resolve(ssb)
   }).catch(() => {
     debug('Initial connection attempt failed')
     debug('Starting Scuttlebutt server')
-
-    server(ssbConfig)
-
+    require('./server')
     const connectOrRetry = () => {
       rawConnect().then((ssb) => {
         debug('Retrying connection to own server')

@@ -1,14 +1,27 @@
 {
   "name": "@fraction/oasis",
-  "version": "2.1.2",
-  "main": "index.js",
+  "version": "2.9.10",
+  "description": "friendly neighborhood scuttlebutt interface",
+  "repository": "git@github.com:fraction/oasis.git",
+  "license": "AGPL-3.0",
   "author": "Christian Bundy <christianbundy@fraction.io>",
-  "license": "ISC",
+  "main": "index.js",
+  "bin": {
+    "oasis": "./index.js"
+  },
+  "scripts": {
+    "dev": "nodemon --inspect index.js --debug --no-open",
+    "fix": "standard --fix && stylelint --fix src/assets/*.css",
+    "start": "node index.js",
+    "test": "standard && dependency-check ./package.json --unused --no-dev --ignore-module highlight.js --ignore-module @fraction/base16-css && cspell --no-summary '**/*.{js,md}' && stylelint src/assets/*.css && tsc --allowJs --resolveJsonModule --lib dom --checkJs --noEmit --skipLibCheck index.js",
+    "preversion": "npm test"
+  },
   "dependencies": {
-    "@fraction/flotilla": "^1.0.1",
     "bcrypt": "^3.0.6",
+    "@fraction/base16-css": "^1.1.0",
+    "@fraction/flotilla": "3.0.0",
     "debug": "^4.1.1",
-    "highlight.js": "^9.15.8",
+    "highlight.js": "^9.16.2",
     "hyperaxe": "^1.3.0",
     "koa": "^2.7.0",
     "koa-body": "^4.1.0",
@@ -17,35 +30,32 @@
     "koa-router": "^7.4.0",
     "koa-static": "^5.0.0",
     "lodash": "^4.17.11",
-    "open": "^6.3.0",
+    "open": "7.0.0",
     "pretty-ms": "^5.0.0",
+    "pull-paramap": "^1.2.2",
+    "pull-sort": "^1.0.2",
     "pull-stream": "^3.6.12",
     "require-style": "^1.1.0",
-    "sharp": "^0.23.0",
     "ssb-client": "^4.7.7",
-    "ssb-config": "github:ssbc/ssb-config#auto-config-incoming",
-    "ssb-markdown": "^5.0.2",
+    "ssb-config": "^3.4.3",
+    "ssb-markdown": "^6.0.2",
     "ssb-mentions": "^0.5.0",
     "ssb-msgs": "^5.2.0",
     "ssb-ref": "^2.13.9",
-    "yargs": "14.0.0"
+    "ssb-thread-schema": "^1.1.1",
+    "yargs": "^15.0.0"
   },
-  "bin": {
-    "oasis": "./index.js"
-  },
-  "description": "friendly neighborhood scuttlebutt interface",
-  "repository": "git@github.com:fraction/oasis.git",
   "devDependencies": {
-    "cspell": "^4.0.23",
-    "dependency-check": "4.1.0",
+    "cspell": "^4.0.43",
+    "dependency-check": "^4.1.0",
     "husky": "^3.0.5",
-    "nodemon": "^1.19.1",
-    "standard": "14.3.0"
+    "nodemon": "^2.0.2",
+    "standard": "^14.3.0",
+    "stylelint": "^12.0.1",
+    "stylelint-config-standard": "^19.0.0",
+    "typescript": "^3.7.4"
   },
-  "scripts": {
-    "start": "node index.js",
-    "debug": "nodemon --inspect index.js --debug",
-    "test": "standard && dependency-check ./package.json --unused --no-dev --ignore-module highlight.js && cspell --no-summary '**/*.{js,md}'",
-    "preversion": "npm test"
+  "optionalDependencies": {
+    "sharp": "^0.23.0"
   }
 }

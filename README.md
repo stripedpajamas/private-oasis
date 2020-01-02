@@ -6,4 +6,4 @@ The authentication wrapper is expecting a function `getPwdHash()` that returns a
 
 ## License
 
-ISC
+AGPL-3.0

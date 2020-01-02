@@ -6,22 +6,24 @@ const meta = require('./models/meta')
 const authorView = require('./views/author')
 
 module.exports = async function profilePage () {
-  const whoami = await meta.whoami()
-  const feedId = whoami.id
+  const myFeedId = await meta.myFeedId()
 
-  const description = await about.description(feedId)
-  const name = await about.name(feedId)
-  const image = await about.image(feedId)
+  const description = await about.description(myFeedId)
+  const name = await about.name(myFeedId)
+  const image = await about.image(myFeedId)
+  const aboutPairs = await about.all(myFeedId)
 
-  const messages = await post.fromFeed(feedId)
+  const messages = await post.fromFeed(myFeedId)
 
-  const avatarUrl = `/image/64/${encodeURIComponent(image)}`
+  const avatarUrl = `/image/256/${encodeURIComponent(image)}`
 
   return authorView({
-    feedId,
+    feedId: myFeedId,
     messages,
     name,
     description,
-    avatarUrl
+    avatarUrl,
+    aboutPairs,
+    relationship: null
   })
 }

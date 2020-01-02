@@ -1,21 +1,19 @@
 'use strict'
 
 const {
-  p,
   a,
-  strong,
   button,
   form,
-  textarea
+  textarea,
+  p,
+  strong
 } = require('hyperaxe')
-const debug = require('debug')('oasis')
 
+const debug = require('debug')('oasis:views:comment')
 const template = require('./components/template')
 const post = require('./components/post')
 
-module.exports = async ({ messages, myFeedId }) => {
-  const replyForm = `/reply/${encodeURIComponent(messages[messages.length - 1].key)}`
-
+module.exports = async ({ messages, myFeedId, parentMessage }) => {
   let markdownMention
 
   const messageElements = await Promise.all(
@@ -24,7 +22,7 @@ module.exports = async ({ messages, myFeedId }) => {
       const authorName = message.value.meta.author.name
       const authorFeedId = message.value.author
       if (authorFeedId !== myFeedId) {
-        if (message.key === messages[0].key) {
+        if (message.key === parentMessage.key) {
           const x = `[@${authorName}](${authorFeedId})\n\n`
           markdownMention = x
         }
@@ -33,17 +31,20 @@ module.exports = async ({ messages, myFeedId }) => {
     })
   )
 
+  const action = `/comment/${encodeURIComponent(messages[0].key)}`
+  const method = 'post'
+
   return template(
     messageElements,
     p('Write a ',
-      strong('public reply'),
-      ' to this message with ',
+      strong('public comment'),
+      ' on this thread with ',
       a({ href: 'https://commonmark.org/help/' }, 'Markdown'),
-      '. Messages cannot be edited or deleted. To respond to an entire thread, select ',
-      strong('comment'),
+      '. Messages cannot be edited or deleted. To respond to an individual message, select ',
+      strong('reply'),
       ' instead.'
     ),
-    form({ action: replyForm, method: 'post' },
+    form({ action, method },
       textarea({
         autofocus: true,
         required: true,
@@ -51,6 +52,6 @@ module.exports = async ({ messages, myFeedId }) => {
       }, markdownMention),
       button({
         type: 'submit'
-      }, 'reply'))
+      }, 'comment'))
   )
 }

@@ -20,7 +20,7 @@ const config = yargs
     type: 'string'
   })
   .options('port', {
-    describe: 'Set port for web app to listen on',
+    describe: 'Port for web app to listen on',
     default: 3000,
     type: 'number'
   })
@@ -39,13 +39,14 @@ const config = yargs
 process.argv = []
 
 if (config.debug) {
-  process.env.DEBUG = '*'
+  process.env.DEBUG = 'oasis,oasis:*'
 }
 
 const app = require('./src/app')
 
 const start = async () => {
-  config.readme = await fs.readFile(path.join(__dirname, 'README.md'), 'utf8')
+  const filePath = path.join(__dirname, 'README.md')
+  config.readme = await fs.readFile(filePath, 'utf8')
   app(config)
 }
 
