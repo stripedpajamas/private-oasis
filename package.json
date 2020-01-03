@@ -13,7 +13,7 @@
     "dev": "nodemon --inspect index.js --debug --no-open",
     "fix": "standard --fix && stylelint --fix src/assets/*.css",
     "start": "node index.js",
-    "test": "standard && dependency-check ./package.json --unused --no-dev --ignore-module highlight.js --ignore-module @fraction/base16-css && cspell --no-summary '**/*.{js,md}' && stylelint src/assets/*.css && tsc --allowJs --resolveJsonModule --lib dom --checkJs --noEmit --skipLibCheck index.js",
+    "test": "standard && dependency-check ./package.json --unused --no-dev --ignore-module highlight.js --ignore-module @fraction/base16-css && cspell --no-summary '**/*.{js,md}' && stylelint src/assets/*.css && tsc --allowJs --resolveJsonModule --lib dom --checkJs --noEmit --skipLibCheck index.js && ava",
     "preversion": "npm test"
   },
   "dependencies": {
@@ -46,6 +46,7 @@
     "yargs": "^15.0.0"
   },
   "devDependencies": {
+    "ava": "^2.4.0",
     "cspell": "^4.0.43",
     "dependency-check": "^4.1.0",
     "husky": "^3.0.5",

@@ -1,6 +1,6 @@
-const crypto = require('crypto')
 const bcrypt = require('bcrypt')
 const debug = require('debug')('oasis')
+const store = require('./store')
 
 const COOKIE_NAME = 'private-oasis'
 const DEFAULT_ATTEMPTS = 3
@@ -13,7 +13,8 @@ function withAuth (userConfig = {}) {
     cooloff: DEFAULT_COOLOFF,
     cookieName: COOKIE_NAME,
     loginRoute: DEFAULT_LOGIN_ROUTE,
-    getPwdHash: null
+    getPwdHash: null,
+    store
   }, userConfig)
 
   if (typeof config.getPwdHash !== 'function' || typeof config.getPwdHash() !== 'string') {
@@ -22,23 +23,12 @@ function withAuth (userConfig = {}) {
 
   const state = {
     remainingAttempts: config.attempts,
-    authenticated: false,
-    session: null,
     cooloffTimer: null
-  }
-
-  function createSession () {
-    debug('Creating new session')
-    state.session = crypto.randomBytes(32).toString('hex')
-    state.authenticated = true
-    return state.session
   }
 
   function noteFailure () {
     debug('Failure to authenticate')
     clearTimeout(state.cooloffTimer)
-    state.authenticated = false
-    state.session = null
     state.remainingAttempts--
     if (state.remainingAttempts < 1) {
       debug('All authentication attempts used; cooling off')
@@ -66,17 +56,17 @@ function withAuth (userConfig = {}) {
         fail()
         return
       }
-      const session = createSession()
-      ctx.cookies.set(config.cookieName, session)
+      const sessionId = config.store.createSession()
+      ctx.cookies.set(config.cookieName, sessionId)
       ctx.redirect('/')
     },
     session: async (ctx, next) => {
-      const cookie = ctx.cookies.get(config.cookieName)
-      if (!state.authenticated || cookie.length !== state.session.length) {
+      const sid = ctx.cookies.get(config.cookieName)
+      if (!sid) {
         ctx.redirect(config.loginRoute)
         return
       }
-      if (!crypto.timingSafeEqual(Buffer.from(cookie), Buffer.from(state.session))) {
+      if (!config.store.getSession(sid)) {
         ctx.redirect(config.loginRoute)
         return
       }
