@@ -56,7 +56,7 @@ function withAuth (userConfig = {}) {
         fail()
         return
       }
-      const sessionId = config.store.createSession()
+      const sessionId = config.store.createSession({}) // empty data
       ctx.cookies.set(config.cookieName, sessionId)
       ctx.redirect('/')
     },
