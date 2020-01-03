@@ -63,10 +63,12 @@ function withAuth (userConfig = {}) {
     session: async (ctx, next) => {
       const sid = ctx.cookies.get(config.cookieName)
       if (!sid) {
+        debug('Request without session ID in cookie, redirecting to login route')
         ctx.redirect(config.loginRoute)
         return
       }
       if (!config.store.getSession(sid)) {
+        debug('No session found, redirecting to login route')
         ctx.redirect(config.loginRoute)
         return
       }
