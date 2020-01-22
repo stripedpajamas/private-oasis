@@ -3,7 +3,6 @@ This repo is a fork of https://github.com/fraction/oasis that I manually keep up
 
 The authentication wrapper is expecting a function `getPwdHash()` that returns a bcrypt-hashed password string. 
 
-
 ## License
 
 AGPL-3.0

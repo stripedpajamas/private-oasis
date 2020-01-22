@@ -1,4 +1,5 @@
 # Changelog
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
@@ -14,6 +15,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 ### Security
 -->
+
+## v2.11.0 - 2020-01-16
+
+### Added
+
+- Add follow/unfollow
+- Add `--offline` CLI flag
+
+### Fixed
+
+- Fixed old messages appearing outside 'popular' time range
 
 ## [2.1.0] - 2019-09-24
 
