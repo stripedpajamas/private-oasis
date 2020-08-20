@@ -18,7 +18,7 @@
     "version": "changelog-version && git add CHANGELOG.md"
   },
   "dependencies": {
-    "bcrypt": "^3.0.6",
+    "bcrypt": "^5.0.0",
     "@fraction/base16-css": "^1.1.0",
     "@fraction/flotilla": "3.0.0",
     "debug": "^4.1.1",
